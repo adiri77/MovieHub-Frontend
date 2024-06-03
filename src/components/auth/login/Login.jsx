@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './style.scss';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Login = () => {
     const [login, setLogin] = useState(true);
@@ -12,10 +13,30 @@ const Login = () => {
         setLogin(!login);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Perform login or registration logic here
-        console.log(`Email: ${email}, Password: ${password}`);
+
+        const user = { email, password };
+
+        try {
+            const response = await axios.post('http://localhost:3000/auth/login', user, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.status === 200) {
+                console.log('Login successful', response.data);
+                // You can save the token or any other response data here if needed
+                // For example, localStorage.setItem('token', response.data.token);
+                navigate('/');
+            } else {
+                console.error('Login failed', response.data);
+            }
+        } catch (error) {
+            console.error('An error occurred', error.response ? error.response.data : error.message);
+        }
+
         // Reset form fields
         setEmail('');
         setPassword('');
@@ -25,10 +46,7 @@ const Login = () => {
         <div className="App">
             <div className="container">
                 <div className="form-container">
-                    <h1>
-                        {/* {login ? 'Login' : 'Register'} */}
-                        Login
-                    </h1>
+                    <h1>Login</h1>
                     <form onSubmit={handleSubmit}>
                         <input
                             type="email"
@@ -44,17 +62,14 @@ const Login = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
-                        <button type="submit" onClick={() => {email.length>=1&&password.length>=1 ? navigate("/"):""}} >
-                            {/* {login ? 'Login' : 'Register'} */}
+                        <button type="submit">
                             Login
                         </button>
                     </form>
                     <div className="toggle-container">
                         <p>
-                            {/* {login ? "Don't have an account?" : 'Already have an account?'} */}
                             Don't have an account?
                             <Link className="toggle-link" onClick={handleToggle} to={"/register"}>
-                                {/* {login ? 'Register here' : 'Login here'} */}
                                 Register here
                             </Link>
                         </p>

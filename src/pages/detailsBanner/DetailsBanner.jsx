@@ -15,8 +15,10 @@ import VideoPopup from "../../components/videoPopup/VideoPopup";
 const DetailsBanner = ({ video, crew }) => {
     const [show, setShow] = useState(false);
     const [videoId, setVideoId] = useState(null);
-    const { mediaType, id } = useParams();
+    const { mediaType: rawMediaType, id } = useParams();
+    const mediaType = rawMediaType || 'movie';
     const { data, loading } = useFetch(`/${mediaType}/${id}`)
+    console.log(data,"'''''''''''''''''''''''''''''''''");
     const { url } = useSelector((state) => state.home)
     
     const _genres = data?.genres?.map((i) => i.id);

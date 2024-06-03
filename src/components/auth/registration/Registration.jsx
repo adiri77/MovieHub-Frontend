@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './style.scss';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Register = () => {
     const [login, setLogin] = useState(true);
@@ -9,16 +10,35 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-
     const handleToggle = () => {
         setLogin(!login);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Perform login or registration logic here
-        console.log(`Email: ${email}, Password: ${password}`);
+        
+        const user = { name, email, password };
+
+        try {
+            const response = await axios.post('http://localhost:3000/auth/register', user, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.status === 201) {
+                console.log('Registration successful', response.data);
+                // Redirect to login page
+                navigate('/login');
+            } else {
+                console.error('Registration failed', response.data);
+            }
+        } catch (error) {
+            console.error('An error occurred', error.response ? error.response.data : error.message);
+        }
+
         // Reset form fields
+        setName('');
         setEmail('');
         setPassword('');
     };
@@ -27,10 +47,7 @@ const Register = () => {
         <div className="App">
             <div className="container">
                 <div className="form-container">
-                    <h1>
-                        {/* {login ? 'Login' : 'Register'} */}
-                        Register
-                    </h1>
+                    <h1>Register</h1>
                     <form onSubmit={handleSubmit}>
                         <input
                             type="text"
@@ -53,17 +70,14 @@ const Register = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
-                        <button type="submit" onClick={() => { name.length>=1 && email.length >=1 && password.length >=1 ? navigate("/login") : "" }}>
-                            {/* {login ? 'Login' : 'Register'} */}
+                        <button type="submit">
                             Register
                         </button>
                     </form>
                     <div className="toggle-container">
                         <p>
-                            {/* {login ? "Don't have an account?" : 'Already have an account?'} */}
                             Already have an account?
                             <Link className="toggle-link" onClick={handleToggle} to={"/login"}>
-                                {/* {login ? 'Register here' : 'Login here'} */}
                                 Login here
                             </Link>
                         </p>
